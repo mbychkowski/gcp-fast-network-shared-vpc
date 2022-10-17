@@ -17,7 +17,7 @@
 # tfdoc:file:description Production spoke VPC and related resources.
 
 module "prod-spoke-project" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//project
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//project"
   billing_account = var.billing_account.id
   name            = "prod-net-spoke-0"
   parent          = var.folder_ids.networking-prod
@@ -44,7 +44,7 @@ module "prod-spoke-project" {
 }
 
 module "prod-spoke-vpc" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc"
   project_id                      = module.prod-spoke-project.project_id
   name                            = "prod-spoke-0"
   mtu                             = 1500
@@ -100,7 +100,7 @@ module "prod-spoke-vpc" {
 }
 
 module "prod-spoke-firewall" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc-firewall
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc-firewall"
   project_id          = module.prod-spoke-project.project_id
   network             = module.prod-spoke-vpc.name
   admin_ranges        = []
@@ -112,7 +112,7 @@ module "prod-spoke-firewall" {
 }
 
 module "peering-prod" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc-peering
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc-peering"
   prefix        = "prod-peering-0"
   local_network = module.prod-spoke-vpc.self_link
   peer_network  = module.landing-trusted-vpc.self_link

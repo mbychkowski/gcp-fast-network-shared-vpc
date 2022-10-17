@@ -17,7 +17,7 @@
 # tfdoc:file:description Landing VPC and related resources.
 
 module "landing-project" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//project
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//project"
   billing_account = var.billing_account.id
   name            = "prod-net-landing-0"
   parent          = var.folder_ids.networking-prod
@@ -46,7 +46,7 @@ module "landing-project" {
 # Untrusted VPC
 
 module "landing-untrusted-vpc" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc"
   project_id = module.landing-project.project_id
   name       = "prod-untrusted-landing-0"
   mtu        = 1500
@@ -61,7 +61,7 @@ module "landing-untrusted-vpc" {
 }
 
 module "landing-untrusted-firewall" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc-firewall
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc-firewall"
   project_id          = module.landing-project.project_id
   network             = module.landing-untrusted-vpc.name
   admin_ranges        = []
@@ -75,7 +75,7 @@ module "landing-untrusted-firewall" {
 # NAT
 
 module "landing-nat-ew1" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-cloudnat
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-cloudnat"
   project_id     = module.landing-project.project_id
   region         = "europe-west1"
   name           = "ew1"
@@ -86,7 +86,7 @@ module "landing-nat-ew1" {
 }
 
 module "landing-nat-ew4" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-cloudnat
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-cloudnat"
   project_id     = module.landing-project.project_id
   region         = "europe-west4"
   name           = "ew4"
@@ -99,7 +99,7 @@ module "landing-nat-ew4" {
 # Trusted VPC
 
 module "landing-trusted-vpc" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc"
   project_id                      = module.landing-project.project_id
   name                            = "prod-trusted-landing-0"
   delete_default_routes_on_create = true
@@ -133,7 +133,7 @@ module "landing-trusted-vpc" {
 }
 
 module "landing-trusted-firewall" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc-firewall
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc-firewall"
   project_id          = module.landing-project.project_id
   network             = module.landing-trusted-vpc.name
   admin_ranges        = []

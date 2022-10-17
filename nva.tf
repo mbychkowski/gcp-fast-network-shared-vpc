@@ -28,7 +28,7 @@ locals {
 # europe-west1
 
 module "nva-template-ew1" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//compute-vm
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//compute-vm"
   project_id     = module.landing-project.project_id
   name           = "nva-template"
   zone           = "europe-west1-b"
@@ -80,7 +80,7 @@ module "nva-template-ew1" {
 }
 
 module "nva-mig-ew1" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//compute-mig
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//compute-mig"
   project_id  = module.landing-project.project_id
   regional    = true
   location    = "europe-west1"
@@ -103,7 +103,7 @@ module "nva-mig-ew1" {
 }
 
 module "ilb-nva-untrusted-ew1" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-ilb
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-ilb"
   project_id    = module.landing-project.project_id
   region        = "europe-west1"
   name          = "ilb-nva-untrusted-ew1"
@@ -122,7 +122,7 @@ module "ilb-nva-untrusted-ew1" {
 }
 
 module "ilb-nva-trusted-ew1" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-ilb
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-ilb"
   project_id    = module.landing-project.project_id
   region        = "europe-west1"
   name          = "ilb-nva-trusted-ew1"
@@ -143,7 +143,7 @@ module "ilb-nva-trusted-ew1" {
 # europe-west4
 
 module "nva-template-ew4" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//compute-vm
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//compute-vm"
   project_id     = module.landing-project.project_id
   name           = "nva-template"
   zone           = "europe-west4-a"
@@ -188,7 +188,7 @@ module "nva-template-ew4" {
 }
 
 module "nva-mig-ew4" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//compute-mig
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//compute-mig"
   project_id  = module.landing-project.project_id
   regional    = true
   location    = "europe-west4"
@@ -211,7 +211,7 @@ module "nva-mig-ew4" {
 }
 
 module "ilb-nva-untrusted-ew4" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-ilb
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-ilb"
   project_id    = module.landing-project.project_id
   region        = "europe-west4"
   name          = "ilb-nva-untrusted-ew4"
@@ -230,7 +230,7 @@ module "ilb-nva-untrusted-ew4" {
 }
 
 module "ilb-nva-trusted-ew4" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-ilb
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-ilb"
   project_id    = module.landing-project.project_id
   region        = "europe-west4"
   name          = "ilb-nva-trusted-ew4"

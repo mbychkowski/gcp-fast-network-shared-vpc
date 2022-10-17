@@ -39,7 +39,7 @@ locals {
 }
 
 module "folder" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//folder
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//folder"
   parent        = "organizations/${var.organization.id}"
   name          = "Networking"
   folder_create = var.folder_ids.networking == null

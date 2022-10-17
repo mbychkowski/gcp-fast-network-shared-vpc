@@ -34,7 +34,7 @@ locals {
 
 module "landing-to-onprem-ew1-vpn" {
   count                 = local.enable_onprem_vpn ? 1 : 0
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpn-ha
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpn-ha"
   project_id            = module.landing-project.project_id
   network               = module.landing-trusted-vpc.self_link
   region                = "europe-west1"
@@ -63,7 +63,7 @@ module "landing-to-onprem-ew1-vpn" {
 
 module "landing-to-onprem-ew4-vpn" {
   count                 = local.enable_onprem_vpn ? 1 : 0
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpn-ha
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpn-ha"
   project_id            = module.landing-project.project_id
   network               = module.landing-trusted-vpc.self_link
   region                = "europe-west4"

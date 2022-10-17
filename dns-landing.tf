@@ -19,7 +19,7 @@
 # forwarding to on-prem DNS resolvers
 
 module "onprem-example-dns-forwarding" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//dns
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//dns"
   project_id = module.landing-project.project_id
   type       = "forwarding"
   name       = "example-com"
@@ -32,7 +32,7 @@ module "onprem-example-dns-forwarding" {
 }
 
 module "reverse-10-dns-forwarding" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//dns
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//dns"
   project_id = module.landing-project.project_id
   type       = "forwarding"
   name       = "root-reverse-10"
@@ -45,7 +45,7 @@ module "reverse-10-dns-forwarding" {
 }
 
 module "gcp-example-dns-private-zone" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//dns
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//dns"
   project_id = module.landing-project.project_id
   type       = "private"
   name       = "gcp-example-com"
@@ -62,7 +62,7 @@ module "gcp-example-dns-private-zone" {
 # Google API zone to trigger Private Access
 
 module "googleapis-private-zone" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//dns
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//dns"
   project_id = module.landing-project.project_id
   type       = "private"
   name       = "googleapis-com"
