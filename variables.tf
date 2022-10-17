@@ -35,21 +35,15 @@ variable "custom_adv" {
   description = "Custom advertisement definitions in name => range format."
   type        = map(string)
   default = {
-    cloud_dns                 = "35.199.192.0/19"
-    gcp_all                   = "10.128.0.0/16"
-    gcp_dev_ew1               = "10.128.128.0/19"
-    gcp_dev_ew4               = "10.128.160.0/19"
-    gcp_landing_trusted_ew1   = "10.128.64.0/19"
-    gcp_landing_trusted_ew4   = "10.128.96.0/19"
-    gcp_landing_untrusted_ew1 = "10.128.0.0/19"
-    gcp_landing_untrusted_ew4 = "10.128.32.0/19"
-    gcp_prod_ew1              = "10.128.192.0/19"
-    gcp_prod_ew4              = "10.128.224.0/19"
-    googleapis_private        = "199.36.153.8/30"
-    googleapis_restricted     = "199.36.153.4/30"
-    rfc_1918_10               = "10.0.0.0/8"
-    rfc_1918_172              = "172.16.0.0/12"
-    rfc_1918_192              = "192.168.0.0/16"
+    cloud_dns             = "35.199.192.0/19"
+    gcp_all               = "10.128.0.0/16"
+    gcp_dev               = "10.128.32.0/19"
+    gcp_prod              = "10.128.64.0/19"
+    googleapis_private    = "199.36.153.8/30"
+    googleapis_restricted = "199.36.153.4/30"
+    rfc_1918_10           = "10.0.0.0/8"
+    rfc_1918_172          = "172.16.0.0/12"
+    rfc_1918_192          = "192.168.0.0/16"
   }
 }
 
@@ -69,10 +63,11 @@ variable "data_dir" {
 }
 
 variable "dns" {
-  description = "Onprem DNS resolvers"
+  description = "Onprem DNS resolvers."
   type        = map(list(string))
   default = {
-    onprem = ["10.0.200.3"]
+    prod = ["10.0.1.1"]
+    dev  = ["10.0.2.1"]
   }
 }
 
@@ -93,22 +88,14 @@ variable "l7ilb_subnets" {
     region        = string
   })))
   default = {
-    dev = [
-      { ip_cidr_range = "10.128.159.0/24", region = "europe-west1" },
-      { ip_cidr_range = "10.128.191.0/24", region = "europe-west4" }
-    ]
     prod = [
-      { ip_cidr_range = "10.128.223.0/24", region = "europe-west1" },
-      { ip_cidr_range = "10.128.255.0/24", region = "europe-west4" }
+      { ip_cidr_range = "10.128.92.0/24", region = "europe-west1" },
+      { ip_cidr_range = "10.128.93.0/24", region = "europe-west4" }
     ]
-  }
-}
-
-variable "onprem_cidr" {
-  description = "Onprem addresses in name => range format."
-  type        = map(string)
-  default = {
-    main = "10.0.0.0/24"
+    dev = [
+      { ip_cidr_range = "10.128.60.0/24", region = "europe-west1" },
+      { ip_cidr_range = "10.128.61.0/24", region = "europe-west4" }
+    ]
   }
 }
 
@@ -161,36 +148,23 @@ variable "psa_ranges" {
   # default = {
   #   dev = {
   #     ranges = {
-  #       cloudsql-mysql-ew1     = "10.128.157.0/24"
-  #       cloudsql-mysql-ew4     = "10.128.189.0/24"
-  #       cloudsql-sqlserver-ew1 = "10.128.158.0/24"
-  #       cloudsql-sqlserver-ew4 = "10.128.190.0/24"
+  #       cloudsql-mysql     = "10.128.62.0/24"
+  #       cloudsql-sqlserver = "10.128.63.0/24"
   #     }
   #     routes = null
   #   }
   #   prod = {
   #     ranges = {
-  #       cloudsql-mysql-ew1     = "10.128.221.0/24"
-  #       cloudsql-mysql-ew4     = "10.128.253.0/24"
-  #       cloudsql-sqlserver-ew1 = "10.128.222.0/24"
-  #       cloudsql-sqlserver-ew4 = "10.128.254.0/24"
+  #       cloudsql-mysql     = "10.128.94.0/24"
+  #       cloudsql-sqlserver = "10.128.95.0/24"
   #     }
   #     routes = null
   #   }
   # }
 }
 
-variable "region_trigram" {
-  description = "Short names for GCP regions."
-  type        = map(string)
-  default = {
-    europe-west1 = "ew1"
-    europe-west3 = "ew3"
-  }
-}
-
-variable "router_configs" {
-  description = "Configurations for CRs and onprem routers."
+variable "router_onprem_configs" {
+  description = "Configurations for routers used for onprem connectivity."
   type = map(object({
     adv = object({
       custom  = list(string)
@@ -199,13 +173,13 @@ variable "router_configs" {
     asn = number
   }))
   default = {
-    landing-trusted-ew1 = {
-      asn = "64512"
+    prod-ew1 = {
+      asn = "65533"
       adv = null
       # adv = { default = false, custom = [] }
     }
-    landing-trusted-ew4 = {
-      asn = "64512"
+    dev-ew1 = {
+      asn = "65534"
       adv = null
       # adv = { default = false, custom = [] }
     }
@@ -218,8 +192,6 @@ variable "service_accounts" {
   type = object({
     data-platform-dev    = string
     data-platform-prod   = string
-    gke-dev              = string
-    gke-prod             = string
     project-factory-dev  = string
     project-factory-prod = string
   })
@@ -249,11 +221,11 @@ variable "vpn_onprem_configs" {
     }))
   }))
   default = {
-    landing-trusted-ew1 = {
+    dev-ew1 = {
       adv = {
         default = false
         custom = [
-          "cloud_dns", "googleapis_private", "googleapis_restricted", "gcp_all"
+          "cloud_dns", "googleapis_private", "googleapis_restricted", "gcp_dev"
         ]
       }
       peer_external_gateway = {
@@ -264,14 +236,14 @@ variable "vpn_onprem_configs" {
       }
       tunnels = [
         {
-          peer_asn                        = 65534
+          peer_asn                        = 65544
           peer_external_gateway_interface = 0
           secret                          = "foobar"
           session_range                   = "169.254.1.0/30"
           vpn_gateway_interface           = 0
         },
         {
-          peer_asn                        = 65534
+          peer_asn                        = 65544
           peer_external_gateway_interface = 0
           secret                          = "foobar"
           session_range                   = "169.254.1.4/30"
@@ -279,11 +251,11 @@ variable "vpn_onprem_configs" {
         }
       ]
     }
-    landing-trusted-ew4 = {
+    prod-ew1 = {
       adv = {
         default = false
         custom = [
-          "cloud_dns", "googleapis_private", "googleapis_restricted", "gcp_all"
+          "cloud_dns", "googleapis_private", "googleapis_restricted", "gcp_prod"
         ]
       }
       peer_external_gateway = {
@@ -294,14 +266,14 @@ variable "vpn_onprem_configs" {
       }
       tunnels = [
         {
-          peer_asn                        = 65534
+          peer_asn                        = 65543
           peer_external_gateway_interface = 0
           secret                          = "foobar"
           session_range                   = "169.254.1.0/30"
           vpn_gateway_interface           = 0
         },
         {
-          peer_asn                        = 65534
+          peer_asn                        = 65543
           peer_external_gateway_interface = 0
           secret                          = "foobar"
           session_range                   = "169.254.1.4/30"

@@ -18,24 +18,26 @@
 
 locals {
   custom_roles = coalesce(var.custom_roles, {})
-  l7ilb_subnets = { for env, v in var.l7ilb_subnets : env => [
-    for s in v : merge(s, {
-      active = true
-      name   = "${env}-l7ilb-${s.region}"
+  l7ilb_subnets = {
+    for env, v in var.l7ilb_subnets : env => [
+      for s in v : merge(s, {
+        active = true
+        name   = "${env}-l7ilb-${s.region}"
     })]
   }
-  service_accounts = {
-    for k, v in coalesce(var.service_accounts, {}) :
-    k => "serviceAccount:${v}" if v != null
+  region_trigram = {
+    europe-west1 = "ew1"
+    europe-west3 = "ew3"
   }
   stage3_sas_delegated_grants = [
     "roles/composer.sharedVpcAgent",
     "roles/compute.networkUser",
-    "roles/compute.networkViewer",
     "roles/container.hostServiceAgentUser",
-    "roles/multiclusterservicediscovery.serviceAgent",
     "roles/vpcaccess.user",
   ]
+  service_accounts = {
+    for k, v in coalesce(var.service_accounts, {}) : k => "serviceAccount:${v}" if v != null
+  }
 }
 
 module "folder" {
@@ -53,3 +55,4 @@ module "folder" {
     factory-policy = "factory"
   }
 }
+

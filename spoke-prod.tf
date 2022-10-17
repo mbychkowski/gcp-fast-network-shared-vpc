@@ -23,6 +23,7 @@ module "prod-spoke-project" {
   parent          = var.folder_ids.networking-prod
   prefix          = var.prefix
   services = [
+    "container.googleapis.com",
     "compute.googleapis.com",
     "dns.googleapis.com",
     "iap.googleapis.com",
@@ -34,67 +35,32 @@ module "prod-spoke-project" {
     enabled          = true
     service_projects = []
   }
-  metric_scopes = [module.landing-project.project_id]
   iam = {
     "roles/dns.admin" = compact([
-      try(local.service_accounts.gke-prod, null),
-      try(local.service_accounts.project-factory-prod, null),
+      try(local.service_accounts.project-factory-prod, null)
     ])
   }
 }
 
 module "prod-spoke-vpc" {
   source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc"
-  project_id                      = module.prod-spoke-project.project_id
-  name                            = "prod-spoke-0"
-  mtu                             = 1500
-  data_folder                     = "${var.data_dir}/subnets/prod"
-  delete_default_routes_on_create = true
-  psa_config                      = try(var.psa_ranges.prod, null)
-  subnets_proxy_only              = local.l7ilb_subnets.prod
-  # Set explicit routes for googleapis; send everything else to NVAs
+  project_id         = module.prod-spoke-project.project_id
+  name               = "prod-spoke-0"
+  mtu                = 1500
+  data_folder        = "${var.data_dir}/subnets/prod"
+  psa_config         = try(var.psa_ranges.prod, null)
+  subnets_proxy_only = local.l7ilb_subnets.prod
+  # set explicit routes for googleapis in case the default route is deleted
   routes = {
     private-googleapis = {
       dest_range    = "199.36.153.8/30"
-      priority      = 999
-      tags          = []
       next_hop_type = "gateway"
       next_hop      = "default-internet-gateway"
     }
     restricted-googleapis = {
       dest_range    = "199.36.153.4/30"
-      priority      = 999
-      tags          = []
       next_hop_type = "gateway"
       next_hop      = "default-internet-gateway"
-    }
-    nva-ew1-to-ew1 = {
-      dest_range    = "0.0.0.0/0"
-      priority      = 1000
-      tags          = ["ew1"]
-      next_hop_type = "ilb"
-      next_hop      = module.ilb-nva-trusted-ew1.forwarding_rule_address
-    }
-    nva-ew4-to-ew4 = {
-      dest_range    = "0.0.0.0/0"
-      priority      = 1000
-      tags          = ["ew4"]
-      next_hop_type = "ilb"
-      next_hop      = module.ilb-nva-trusted-ew4.forwarding_rule_address
-    }
-    nva-ew1-to-ew4 = {
-      dest_range    = "0.0.0.0/0"
-      priority      = 1001
-      tags          = ["ew1"]
-      next_hop_type = "ilb"
-      next_hop      = module.ilb-nva-trusted-ew4.forwarding_rule_address
-    }
-    nva-ew4-to-ew1 = {
-      dest_range    = "0.0.0.0/0"
-      priority      = 1001
-      tags          = ["ew4"]
-      next_hop_type = "ilb"
-      next_hop      = module.ilb-nva-trusted-ew1.forwarding_rule_address
     }
   }
 }
@@ -111,11 +77,16 @@ module "prod-spoke-firewall" {
   cidr_template_file  = "${var.data_dir}/cidrs.yaml"
 }
 
-module "peering-prod" {
-  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-vpc-peering"
-  prefix        = "prod-peering-0"
-  local_network = module.prod-spoke-vpc.self_link
-  peer_network  = module.landing-trusted-vpc.self_link
+module "prod-spoke-cloudnat" {
+  for_each       = toset(values(module.prod-spoke-vpc.subnet_regions))
+  source = "git@github.com:mbychkowski/gcp-fast-modules.git//net-cloudnat"
+  project_id     = module.prod-spoke-project.project_id
+  region         = each.value
+  name           = "prod-nat-${local.region_trigram[each.value]}"
+  router_create  = true
+  router_network = module.prod-spoke-vpc.name
+  router_asn     = 4200001024
+  logging_filter = "ERRORS_ONLY"
 }
 
 # Create delegated grants for stage3 service accounts
@@ -125,7 +96,6 @@ resource "google_project_iam_binding" "prod_spoke_project_iam_delegated" {
   members = compact([
     try(local.service_accounts.data-platform-prod, null),
     try(local.service_accounts.project-factory-prod, null),
-    try(local.service_accounts.gke-prod, null),
   ])
   condition {
     title       = "prod_stage3_sa_delegated_grants"

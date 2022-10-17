@@ -25,8 +25,14 @@ locals {
   }
 }
 
-resource "google_monitoring_dashboard" "dashboard" {
+resource "google_monitoring_dashboard" "dev-dashboard" {
   for_each       = local.dashboards
-  project        = module.landing-project.project_id
+  project        = module.dev-spoke-project.project_id
+  dashboard_json = file(each.value)
+}
+
+resource "google_monitoring_dashboard" "prod-dashboard" {
+  for_each       = local.dashboards
+  project        = module.prod-spoke-project.project_id
   dashboard_json = file(each.value)
 }
